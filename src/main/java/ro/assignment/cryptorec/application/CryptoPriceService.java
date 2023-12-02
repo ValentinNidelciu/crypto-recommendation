@@ -1,91 +1,80 @@
 package ro.assignment.cryptorec.application;
 
-import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Service;
 import ro.assignment.cryptorec.domain.CryptoPrice;
 import ro.assignment.cryptorec.exposition.views.HighestNormalizedRangeView;
 import ro.assignment.cryptorec.exposition.views.NormalizedRangeView;
-import ro.assignment.cryptorec.infrastructure.importer.CryptoPriceImporter;
-import ro.assignment.cryptorec.infrastructure.persistence.CryptoPriceRepository;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
 
-@Service
-@AllArgsConstructor
-public class CryptoPriceService {
-    private CryptoPriceImporter cryptoPriceImporter;
-    private CryptoPriceRepository cryptoPriceRepository;
+public interface CryptoPriceService {
 
-    public void importPrices() {
-        this.cryptoPriceImporter.importPrices();
-    }
-
-    public List<CryptoPrice> getAll() {
-        return this.cryptoPriceRepository.findAll();
-    }
-
-    public CryptoPrice getOldestPrice(final String symbol) {
-        return this.cryptoPriceRepository.findTopBySymbolOrderByTimestampAsc(symbol);
-    }
-
-    public CryptoPrice getNewestPrice(final String symbol) {
-        return this.cryptoPriceRepository.findTopBySymbolOrderByTimestampDesc(symbol);
-    }
-
-    public CryptoPrice getMinPrice(final String symbol) {
-        return this.cryptoPriceRepository.findTopBySymbolOrderByPriceAsc(symbol);
-    }
-
-    public CryptoPrice getMaxPrice(final String symbol) {
-        return this.cryptoPriceRepository.findTopBySymbolOrderByPriceDesc(symbol);
-    }
+    /**
+     *
+     * This method calls the CryptoPriceImporter's importPrices() method
+     *
+     */
+    void importPrices();
 
 
-    public List<NormalizedRangeView> getAllSortedDescendingByNormalizedRange() {
-        final List<CryptoPrice> allPrices = this.getAll();
+    /**
+     * This method will fetch the list of all price entries.
+     *
+     * @return a list of CryptoPrice objects
+     */
+    List<CryptoPrice> getAll();
 
-        final Map<String, Double> normalizedRangeBySymbol = this.computeNormalizedRanges(allPrices);
+    /**
+     * This method will fetch the oldest price entry for a specific symbol.
+     *
+     * @param symbol - represents the cryptocurrency's symbol
+     *
+     * @return a CryptoPrice object
+     */
+    CryptoPrice getOldestPrice(final String symbol);
 
-        return normalizedRangeBySymbol.entrySet()
-                .stream()
-                .map(entry -> new NormalizedRangeView(entry.getKey(), entry.getValue()))
-                .sorted(Comparator.comparingDouble(NormalizedRangeView::getNormalizedRange).reversed())
-                .toList();
-    }
+    /**
+     * This method will fetch the newest price entry for a specific symbol.
+     *
+     * @param symbol - represents the cryptocurrency's symbol
+     *
+     * @return a CryptoPrice object
+     */
+    CryptoPrice getNewestPrice(final String symbol);
 
-    public HighestNormalizedRangeView getHighestNormalizedRangeForDate(final LocalDate date) {
-        final Long startOfDayInMilliseconds = date.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
-        final Long endOfDayInMilliseconds = date.atTime(LocalTime.MAX).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+    /**
+     * This method will fetch the minimum price entry for a specific symbol.
+     *
+     * @param symbol - represents the cryptocurrency's symbol
+     *
+     * @return a CryptoPrice object
+     */
+    CryptoPrice getMinPrice(final String symbol);
 
-        final List<CryptoPrice> pricesForDate = this.cryptoPriceRepository.findByTimestampBetween(startOfDayInMilliseconds, endOfDayInMilliseconds);
-        final Map<String, Double> normalizedRangeBySymbol = this.computeNormalizedRanges(pricesForDate);
+    /**
+     * This method will fetch the maximum price entry for a specific symbol.
+     *
+     * @param symbol - represents the cryptocurrency's symbol
+     *
+     * @return a CryptoPrice object
+     */
+    CryptoPrice getMaxPrice(final String symbol);
 
-        final Map.Entry<String, Double> maxEntry = normalizedRangeBySymbol.entrySet()
-                .stream()
-                .max(Map.Entry.comparingByKey())
-//                TODO: custom exception
-                .orElseThrow(() -> new RuntimeException("There was a problem computing the highest normalized range. Please try again later."));
+    /**
+     * This method will fetch the list of all normalized range price entries for all symbols sorted descending by the
+     * normalized range.
+     *
+     * @return a NormalizedRangeView object
+     */
+    List<NormalizedRangeView> getAllSortedDescendingByNormalizedRange();
 
-        return new HighestNormalizedRangeView(maxEntry.getKey(), maxEntry.getValue(), date);
-    }
 
-    private Map<String, Double> computeNormalizedRanges(final List<CryptoPrice> prices) {
-        final Map<String, Double> normalizedPriceBySymbol = new HashMap<>();
-
-        prices.stream()
-                .collect(Collectors.groupingBy(CryptoPrice::getSymbol))
-                .forEach((symbol, listOfPrices) -> {
-                    final Double minPrice = Collections.min(listOfPrices, Comparator.comparingDouble(CryptoPrice::getPrice)).getPrice();
-                    final Double maxPrice = Collections.max(listOfPrices, Comparator.comparingDouble(CryptoPrice::getPrice)).getPrice();
-                    final Double normalizedRange = (maxPrice - minPrice) / minPrice;
-                    normalizedPriceBySymbol.put(symbol, normalizedRange);
-                });
-
-        return normalizedPriceBySymbol;
-    }
-
+    /**
+     * This method will fetch the highest normalized range for a specific date. All symbols are included for this query.
+     *
+     * @param date - The date when the query should be applied.
+     *
+     * @return a HighestNormalizedRangeView object
+     */
+    HighestNormalizedRangeView getHighestNormalizedRangeForDate(final LocalDate date);
 }

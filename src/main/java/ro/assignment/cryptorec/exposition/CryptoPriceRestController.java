@@ -90,8 +90,6 @@ public class CryptoPriceRestController {
 
     }
 
-
-
     @Operation(summary = "Fetch the highest normalized range value for all symbols for a specific date.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "The highest normalized range value was found for the specific date"),

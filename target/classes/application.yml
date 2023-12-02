@@ -1,0 +1,8 @@
+
+cryptorec:
+  files-location:
+    - static/prices/BTC_values.csv
+    - static/prices/DOGE_values.csv
+    - static/prices/ETH_values.csv
+    - static/prices/LTC_values.csv
+    - static/prices/XRP_values.csv

@@ -98,6 +98,10 @@ public class CryptoPriceServiceImpl implements CryptoPriceService {
                 .forEach((symbol, listOfPrices) -> {
                     final Double minPrice = Collections.min(listOfPrices, Comparator.comparingDouble(CryptoPrice::getPrice)).getPrice();
                     final Double maxPrice = Collections.max(listOfPrices, Comparator.comparingDouble(CryptoPrice::getPrice)).getPrice();
+
+                    if(minPrice.equals(0.0)) {
+                        throw new ComputeNormalizedRangeException("Minimum price cannot be zero (symbol: " + symbol +")");
+                    }
                     final Double normalizedRange = (maxPrice - minPrice) / minPrice;
                     normalizedPriceBySymbol.put(symbol, normalizedRange);
                 });

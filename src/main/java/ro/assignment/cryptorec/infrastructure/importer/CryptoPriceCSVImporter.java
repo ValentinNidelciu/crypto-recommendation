@@ -10,7 +10,6 @@ import ro.assignment.cryptorec.infrastructure.importer.config.FilesConfig;
 import ro.assignment.cryptorec.infrastructure.importer.model.CryptoPriceCSVModel;
 import ro.assignment.cryptorec.infrastructure.persistence.CryptoPriceRepository;
 
-import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.util.List;
 

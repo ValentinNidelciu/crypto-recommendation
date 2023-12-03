@@ -156,6 +156,19 @@ class CryptoPriceServiceImplTest {
     }
 
     @Test
+    void givenASetOfCryptoPricesThatIncludesZero_whenTryingToComputeTheNormalizedRange_thenAnExceptionMustBeReceived() {
+        final List<CryptoPrice> cryptoPricesThatIncludesZero = List.of(
+                new CryptoPrice("random_id", "BTC", 20000.02, Instant.now().toEpochMilli() - 1000),
+                new CryptoPrice("random_id-2", "XRP", 15.32, Instant.now().toEpochMilli()  - 1200),
+                new CryptoPrice("random_id-3", "DOGE", 0.0, Instant.now().toEpochMilli()  - 1400)
+        );
+
+        when(this.cryptoPriceRepository.findByTimestampBetween(Mockito.anyLong(), Mockito.anyLong())).thenReturn(cryptoPricesThatIncludesZero);
+
+        assertThrows(ComputeNormalizedRangeException.class, () -> this.cryptoPriceService.getHighestNormalizedRangeForDate(LocalDate.now()));
+    }
+
+    @Test
     void givenNoPricesData_whenTryingToFetchAllEntriesSortedDescendingByNormalizedRange_thenAnExceptionMustBeReceived() {
         when(this.cryptoPriceRepository.findAll()).thenReturn(null);
         assertThrows(ComputeNormalizedRangeException.class, () -> this.cryptoPriceService.getAllSortedDescendingByNormalizedRange());

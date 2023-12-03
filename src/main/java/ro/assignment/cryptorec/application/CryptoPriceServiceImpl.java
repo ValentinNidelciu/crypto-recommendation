@@ -2,7 +2,7 @@ package ro.assignment.cryptorec.application;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import ro.assignment.cryptorec.application.exception.ComputeHighestNormalizedRangeException;
+import ro.assignment.cryptorec.application.exception.ComputeNormalizedRangeException;
 import ro.assignment.cryptorec.application.exception.DataNotAvailableException;
 import ro.assignment.cryptorec.domain.CryptoPrice;
 import ro.assignment.cryptorec.exposition.views.HighestNormalizedRangeView;
@@ -81,13 +81,17 @@ public class CryptoPriceServiceImpl implements CryptoPriceService {
         final Map.Entry<String, Double> maxEntry = normalizedRangeBySymbol.entrySet()
                 .stream()
                 .max(Map.Entry.comparingByKey())
-                .orElseThrow(ComputeHighestNormalizedRangeException::new);
+                .orElseThrow(ComputeNormalizedRangeException::new);
 
         return new HighestNormalizedRangeView(maxEntry.getKey(), maxEntry.getValue(), date);
     }
 
     private Map<String, Double> computeNormalizedRanges(final List<CryptoPrice> prices) {
         final Map<String, Double> normalizedPriceBySymbol = new HashMap<>();
+
+        if(Objects.isNull(prices)) {
+            throw new ComputeNormalizedRangeException();
+        }
 
         prices.stream()
                 .collect(Collectors.groupingBy(CryptoPrice::getSymbol))

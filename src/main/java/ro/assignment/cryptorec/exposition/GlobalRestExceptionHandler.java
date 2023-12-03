@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import ro.assignment.cryptorec.application.exception.ComputeHighestNormalizedRangeException;
+import ro.assignment.cryptorec.application.exception.ComputeNormalizedRangeException;
 import ro.assignment.cryptorec.application.exception.DataNotAvailableException;
 import ro.assignment.cryptorec.infrastructure.exceptions.PriceImportException;
 
@@ -21,8 +21,8 @@ public class GlobalRestExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<String> handle(final DataNotAvailableException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
-    @ExceptionHandler(value = ComputeHighestNormalizedRangeException.class)
-    public ResponseEntity<String> handle(final ComputeHighestNormalizedRangeException exception) {
+    @ExceptionHandler(value = ComputeNormalizedRangeException.class)
+    public ResponseEntity<String> handle(final ComputeNormalizedRangeException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 

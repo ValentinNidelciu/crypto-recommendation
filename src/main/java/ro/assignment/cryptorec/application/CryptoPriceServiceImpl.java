@@ -81,7 +81,7 @@ public class CryptoPriceServiceImpl implements CryptoPriceService {
         final Map.Entry<String, Double> maxEntry = normalizedRangeBySymbol.entrySet()
                 .stream()
                 .max(Map.Entry.comparingByKey())
-                .orElseThrow(ComputeNormalizedRangeException::new);
+                .orElseThrow(() -> new ComputeNormalizedRangeException("NormalizedRange cannot be null"));
 
         return new HighestNormalizedRangeView(maxEntry.getKey(), maxEntry.getValue(), date);
     }
@@ -90,7 +90,7 @@ public class CryptoPriceServiceImpl implements CryptoPriceService {
         final Map<String, Double> normalizedPriceBySymbol = new HashMap<>();
 
         if(Objects.isNull(prices)) {
-            throw new ComputeNormalizedRangeException();
+            throw new ComputeNormalizedRangeException("Prices cannot be null");
         }
 
         prices.stream()
@@ -107,7 +107,7 @@ public class CryptoPriceServiceImpl implements CryptoPriceService {
 
     private void checkCryptoPriceResult(final CryptoPrice cryptoPrice) {
         if(Objects.isNull(cryptoPrice)) {
-            throw new DataNotAvailableException();
+            throw new DataNotAvailableException("The CryptoPrice should not be null");
         }
     }
 

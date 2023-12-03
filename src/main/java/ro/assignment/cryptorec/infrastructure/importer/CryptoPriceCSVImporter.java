@@ -11,6 +11,7 @@ import ro.assignment.cryptorec.infrastructure.importer.model.CryptoPriceCSVModel
 import ro.assignment.cryptorec.infrastructure.persistence.CryptoPriceRepository;
 
 import java.io.FileReader;
+import java.io.InputStreamReader;
 import java.util.List;
 
 @Component
@@ -30,14 +31,14 @@ public class CryptoPriceCSVImporter implements CryptoPriceImporter {
         final ClassPathResource resource = new ClassPathResource(fileLocation);
 
         try {
-            final List<CryptoPriceCSVModel> cryptoPrices = new CsvToBeanBuilder<CryptoPriceCSVModel>(new FileReader(resource.getFile()))
+            final List<CryptoPriceCSVModel> cryptoPrices = new CsvToBeanBuilder<CryptoPriceCSVModel>(new InputStreamReader(resource.getInputStream()))
                     .withType(CryptoPriceCSVModel.class)
                     .build()
                     .parse();
             this.persistPrices(cryptoPrices);
         } catch (final Exception ex) {
             ex.printStackTrace();
-            throw new PriceImportException("There was a problem with importing the latest prices. Please try again later.");
+            throw new PriceImportException(ex.getMessage());
         }
     }
 

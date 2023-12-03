@@ -1,8 +1,16 @@
+server:
+  port: ${PORT:8080}
+
 
 cryptorec:
   files-location:
-    - static/prices/BTC_values.csv
-    - static/prices/DOGE_values.csv
-    - static/prices/ETH_values.csv
-    - static/prices/LTC_values.csv
-    - static/prices/XRP_values.csv
+    - ./static/prices/BTC_values.csv
+    - ./static/prices/DOGE_values.csv
+    - ./static/prices/ETH_values.csv
+    - ./static/prices/LTC_values.csv
+    - ./static/prices/XRP_values.csv
+
+spring:
+  data:
+    mongodb:
+      uri: ${MONGO_URL:mongodb://localhost:27017/dev}
